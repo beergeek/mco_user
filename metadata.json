@@ -1,0 +1,17 @@
+{
+  "name": "beergeek-mco_user",
+  "version": "0.1.0",
+  "author": "beergeek",
+  "summary": "Module to make management of mco_user more rubust and granular",
+  "license": "Apache 2.0",
+  "source": "https://github.com/beergeek/mac_mco_user",
+  "project_page": "https://github.com/beergeek/mac_mco_user",
+  "issues_url": "https://github.com/beergeek/mac_mco_user/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs-stdlib",
+      "version_range": ">= 1.0.0"
+    }
+  ]
+}
+
