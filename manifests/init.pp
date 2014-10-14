@@ -235,7 +235,7 @@ define mco_user (
     value   => '/etc/puppetlabs/mcollective/facts.yaml',
   }
 
-  mcollective::common::setting { 'plugin.activemq.base64':
+  mcollective::common::setting { "${username}:plugin.activemq.base64":
     value => 'yes',
   }
 
