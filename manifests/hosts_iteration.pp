@@ -28,8 +28,8 @@ define mco_user::hosts_iteration (
   }
 
   $fallback = $middleware_ssl_fallback ? {
-    true    => 'true',
-    default => 'false',
+    true    => '1',
+    default => '0',
   }
 
   mco_user::setting { "plugin.activemq.pool.${name}.port":
@@ -46,7 +46,7 @@ define mco_user::hosts_iteration (
 
   if $middleware_ssl {
     mco_user::setting { "plugin.activemq.pool.${name}.ssl":
-      value => 'true',
+      value => '1',
     }
 
     mco_user::setting { "plugin.activemq.pool.${name}.ssl.fallback":

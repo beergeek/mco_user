@@ -137,7 +137,7 @@ define mco_user (
   $middleware_port          = '61613',
   $middleware_ssl           = true,
   $middleware_ssl_fallback  = false,
-  $middleware_user          = $title,
+  $middleware_user          = 'mcollective',
   $securityprovider         = 'ssl',
   $site_libdir              = '/usr/local/libexec/mcollective',
 ) {
@@ -233,6 +233,10 @@ define mco_user (
   mco_user::setting { "${username}:plugin.yaml":
     setting => 'plugin.yaml',
     value   => '/etc/puppetlabs/mcollective/facts.yaml',
+  }
+
+  mcollective::common::setting { 'plugin.activemq.base64':
+    value => 'yes',
   }
 
   if $middleware_ssl or $securityprovider == 'ssl' {
