@@ -154,11 +154,12 @@ Default is $name.
 ```puppet
   mco_user { 'peadmin':
     certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
+    homedir           => '/var/lib/peadmin',
     middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
+    middleware_user   => 'mcollective',
+    private_key       => '/etc/puppetlabs/puppet/ssl/private_keys/pe-internal-peadmin-mcollective-client.pem',
     ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
     ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
-    homedir           => '/var/lib/peadmin',
-    middleware_user   => 'mcollective',
   }
 ```
 

@@ -4,9 +4,8 @@ define mco_user::setting(
   $value,
   $order = '70'
 ) {
-  mcollective::setting { "mcollective::user::setting ${title}":
-    setting => $setting,
-    value   => $value,
+  datacat_fragment { "mcollective::user::setting ${title}":
+    data    => hash([ $setting, $value ]),
     target  => "mcollective::user ${username}",
     order   => $order,
   }

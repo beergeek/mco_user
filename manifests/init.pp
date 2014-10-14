@@ -95,12 +95,13 @@
 # === Examples
 #
 #  mco_user { 'peadmin':
-#   certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
-#   middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
-#   ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
-#   ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
-#   homedir           => '/var/lib/peadmin',
-#   middleware_user   => 'mcollective',
+#    certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
+#    homedir           => '/var/lib/peadmin',
+#    middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
+#    middleware_user   => 'mcollective',
+#    private_key       => '/etc/puppetlabs/puppet/ssl/private_keys/pe-internal-peadmin-mcollective-client.pem',
+#    ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
+#    ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
 #  }
 #
 # === Authors
@@ -117,6 +118,7 @@ define mco_user (
   $private_key,
   $ssl_ca_cert,
   $ssl_server_public,
+  $username                 = $name,
   $callerid                 = $name,
   $collectives              = 'mcollective',
   $confdir                  = '/etc/puppetlabs/mcollective',
@@ -133,19 +135,30 @@ define mco_user (
   $middleware_user          = $name,
   $securityprovider         = 'ssl',
   $site_libdir              = '/usr/local/libexec/mcollective',
-  $username                 = $name,
 ) {
 
-  if $::osfamily != 'RedHat' and $::operatingsystemmajrelease != '6' {
-    fail("This module is only designed for RHEL6, not ${::osfamily}, ${::operatingsystemmajrelease}")
+  if $::osfamily != 'RedHat' {
+    fail("This module is only designed for RHEL6, not ${::osfamily}")
+  }
+  if $::operatingsystemmajrelease != '6' {
+    fail("This module is only designed for RHEL6, not RHEL${::operatingsystemmajrelease}")
   }
 
   #validation
+  validate_absolute_path($certificate)
+  validate_absolute_path($private_key)
+  validate_absolute_path($ssl_ca_cert)
+  validate_absolute_path($ssl_server_public)
   validate_bool($middleware_ssl)
   validate_bool($middleware_ssl_fallback)
 
   #variables
   $connector = 'activemq'
+
+  File {
+    owner => $username,
+    group => $group,
+  }
 
   file { [
     "${homedir}/.mcollective.d",
@@ -153,9 +166,8 @@ define mco_user (
     "${homedir}/.mcollective.d/credentials/certs",
     "${homedir}/.mcollective.d/credentials/private_keys"
   ]:
-    ensure => 'directory',
-    owner  => $username,
-    group  => $group,
+    ensure => directory,
+    mode   => '700',
   }
 
   datacat { "mco_user ${username}":
@@ -171,72 +183,77 @@ define mco_user (
     username => $username,
   }
 
-  mco_user::setting { 'logfile':
-    value => $logfile,
+  mco_user::setting { "${username}:logfile":
+    setting => 'logfile',
+    value   => $logfile,
   }
 
-  mco_user::setting { 'loglevel':
-    value => $loglevel,
+  mco_user::setting { "${username}:loglevel":
+    setting => 'loglevel',
+    value   => $loglevel,
   }
 
-  mco_user::setting { 'libdir':
-    value => "${site_libdir}:${core_libdir}",
+  mco_user::setting { "${username}:libdir":
+    setting => 'libdir',
+    value   => "${site_libdir}:${core_libdir}",
   }
 
-  mco_user::setting { 'connector':
-    value => $connector,
+  mco_user::setting { "${username}:connector":
+    setting => 'connector',
+    value   => $connector,
   }
 
-  mco_user::setting { 'securityprovider':
-    value => $securityprovider,
+  mco_user::setting { "${username}:securityprovider":
+    setting => 'securityprovider',
+    value   => $securityprovider,
   }
 
-  mco_user::setting { 'collectives':
-    value => join(flatten([$collectives]), ','),
+  mco_user::setting { "${username}:collectives":
+    setting => 'collectives',
+    value   => join(flatten([$collectives]), ','),
   }
 
-  mco_user::setting { 'main_collective':
-    value => $main_collective,
+  mco_user::setting { "${username}:main_collective":
+    setting => 'main_collective',
+    value   => $main_collective,
   }
 
-  mco_user::setting { 'factsource':
-    value => 'yaml',
+  mco_user::setting { "${username}:factsource":
+    setting => 'factsource',
+    value   => 'yaml',
   }
 
-  mco_user::setting { 'plugin.yaml':
-    value => '/etc/puppetlabs/mcollective/facts.yaml',
+  mco_user::setting { "${username}:plugin.yaml":
+    setting => 'plugin.yaml',
+    value   => '/etc/puppetlabs/mcollective/facts.yaml',
   }
 
   if $middleware_ssl or $securityprovider == 'ssl' {
     file { "${homedir}/.mcollective.d/credentials/certs/ca.pem":
+      ensure => file,
       source => $ssl_ca_cert,
-      owner  => $username,
-      group  => $group,
       mode   => '0444',
     }
 
     file { "${homedir}/.mcollective.d/credentials/certs/server_public.pem":
+      ensure => file,
       source => $ssl_server_public,
-      owner  => $username,
-      group  => $group,
       mode   => '0444',
     }
 
     file { "${homedir}/.mcollective.d/credentials/private_keys/${callerid}.pem":
+      ensure => file,
       source => $private_key,
-      owner  => $username,
-      group  => $group,
       mode   => '0400',
     }
 
     file { "${homedir}/.mcollective.d/credentials/certs/${callerid}.pem":
+      ensure => file,
       source => $certificate,
-      owner  => $username,
-      group  => $group,
       mode   => '0444',
     }
 
-    mco_user::setting {'plugin.ssl_serializer':
+    mco_user::setting {"${username}:plugin.ssl_serializer":
       setting => 'plugin.ssl_serializer',
       value   => 'yaml',
     }
@@ -261,20 +278,23 @@ define mco_user (
   }
 
 
-  mco_user::setting { 'direct_addressing':
-    value => 1,
+  mco_user::setting { "${username}:direct_addressing":
+    setting => 'direct_addressing',
+    value   => 1,
   }
 
-  mco_user::setting { 'plugin.activemq.base64':
-    value => 'yes',
+  mco_user::setting { "${username}:plugin.activemq.base64":
+    setting => 'plugin.activemq.base64',
+    value   => 'true',
   }
 
-  mco_user::setting { 'plugin.activemq.randomize':
-    value => 'true',
+  mco_user::setting { "${username}:plugin.activemq.randomize":
+    setting => 'plugin.activemq.randomize',
+    value   => 'true',
   }
 
   $pool_size = size(flatten([$middleware_hosts]))
-  mco_user::setting { "${username}-plugin.activemq.pool.size":
+  mco_user::setting { "${username}:plugin.activemq.pool.size":
     setting => 'plugin.activemq.pool.size',
     value   => $pool_size,
   }
