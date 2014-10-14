@@ -75,6 +75,10 @@ No Default.
 The absolute path of the local PEM file, ont he node, for the provate key.
 No Default.
 
+#####`public_key`
+The absolute path of the local PEM file, on the node, for the public key.
+No Default.
+
 #####`ssl_ca_cert`
 The absolute path of the local PEM file, on the node, for the CA CERT.
 No Default.
@@ -158,6 +162,7 @@ Default is $name.
     middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
     middleware_user   => 'mcollective',
     private_key       => '/etc/puppetlabs/puppet/ssl/private_keys/pe-internal-peadmin-mcollective-client.pem',
+    public_key        => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-peadmin-mcollective-client.pem',
     ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
     ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
   }

@@ -193,14 +193,6 @@ describe 'mco_user' do
     }
 
     it {
-      should contain_mco_user__setting('peadmin:plugin.activemq.base64').with(
-        'setting'   => 'plugin.activemq.base64',
-        'value'     => 'true',
-        'username'  => 'peadmin',
-      )
-    }
-
-    it {
       should contain_mco_user__setting('peadmin:plugin.activemq.randomize').with(
         'setting'   => 'plugin.activemq.randomize',
         'value'     => 'true',

@@ -13,7 +13,11 @@
 #   No Default.
 #
 # [*private_key*]
-#   The absolute path of the local PEM file, ont he node, for the provate key.
+#   The absolute path of the local PEM file, on the node, for the private key.
+#   No Default.
+#
+# [*public_key*]
+#   The absolute path of the local PEM file, on the node, for the public key.
 #   No Default.
 #
 # [*ssl_ca_cert*]
@@ -116,23 +120,24 @@ define mco_user (
   $certificate,
   $middleware_hosts,
   $private_key,
+  $public_key,
   $ssl_ca_cert,
   $ssl_server_public,
-  $username                 = $name,
-  $callerid                 = $name,
+  $username                 = $title,
+  $callerid                 = $title,
   $collectives              = 'mcollective',
   $confdir                  = '/etc/puppetlabs/mcollective',
   $core_libdir              = '/opt/puppet/libexec/mcollective',
-  $group                    = $name,
-  $homedir                  = "/home/${username}",
-  $logfile                  = "/var/lib/${username}/.mcollective.d/client.log",
+  $group                    = $title,
+  $homedir                  = "/home/${title}",
+  $logfile                  = "/var/lib/${title}/.mcollective.d/client.log",
   $loglevel                 = 'info',
   $main_collective          = 'mcollective',
   $middleware_password      = 'mcollective',
   $middleware_port          = '61613',
   $middleware_ssl           = true,
   $middleware_ssl_fallback  = false,
-  $middleware_user          = $name,
+  $middleware_user          = $title,
   $securityprovider         = 'ssl',
   $site_libdir              = '/usr/local/libexec/mcollective',
 ) {
@@ -147,6 +152,7 @@ define mco_user (
   #validation
   validate_absolute_path($certificate)
   validate_absolute_path($private_key)
+  validate_absolute_path($public_key)
   validate_absolute_path($ssl_ca_cert)
   validate_absolute_path($ssl_server_public)
   validate_bool($middleware_ssl)
@@ -164,7 +170,8 @@ define mco_user (
     "${homedir}/.mcollective.d",
     "${homedir}/.mcollective.d/credentials",
     "${homedir}/.mcollective.d/credentials/certs",
-    "${homedir}/.mcollective.d/credentials/private_keys"
+    "${homedir}/.mcollective.d/credentials/private_keys",
+    "${homedir}/.mcollective.d/credentials/public_keys"
   ]:
     ensure => directory,
     mode   => '700',
@@ -253,6 +260,12 @@ define mco_user (
       mode   => '0444',
     }
 
+    file { "${homedir}/.mcollective.d/credentials/public_keys/${callerid}.pem":
+      ensure => file,
+      source => $public_key,
+      mode   => '0644',
+    }
+
     mco_user::setting {"${username}:plugin.ssl_serializer":
       setting => 'plugin.ssl_serializer',
       value   => 'yaml',
@@ -260,7 +273,7 @@ define mco_user (
 
     mco_user::setting { "${username}:plugin.ssl_client_public":
       setting  => 'plugin.ssl_client_public',
-      value    => "${homedir}/.mcollective.d/credentials/certs/${callerid}.pem",
+      value    => "${homedir}/.mcollective.d/credentials/public_keys/${callerid}.pem",
       order    => '60',
     }
 
@@ -281,11 +294,6 @@ define mco_user (
   mco_user::setting { "${username}:direct_addressing":
     setting => 'direct_addressing',
     value   => 1,
-  }
-
-  mco_user::setting { "${username}:plugin.activemq.base64":
-    setting => 'plugin.activemq.base64',
-    value   => 'true',
   }
 
   mco_user::setting { "${username}:plugin.activemq.randomize":
