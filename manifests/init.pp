@@ -236,7 +236,8 @@ define mco_user (
   }
 
   mcollective::common::setting { "${username}:plugin.activemq.base64":
-    value => 'yes',
+    setting => 'plugin.activemq.base64',
+    value   => 'yes',
   }
 
   if $middleware_ssl or $securityprovider == 'ssl' {
