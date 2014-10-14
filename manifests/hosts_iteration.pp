@@ -1,39 +1,33 @@
 # private define
 # $name will be an index into the $middleware_hostsarray + 1
 define mco_user::hosts_iteration (
+  $confdir,
+  $homedir,
   $middleware_hosts,
   $middleware_password,
+  $middleware_port,
+  $middleware_ssl,
+  $middleware_ssl_fallback,
   $middleware_user,
   $username,
-  $middleware_ssl_port = '61613',
-  $middleware_port = '61613',
-  $middleware_ssl_fallback = false,
-  $middleware_user = $username,
-  $middleware_ssl = true,
-  $confdir = '/etc/puppetlabs/mcollective',
 ) {
   Mco_user::Setting {
     username => $username,
-  } 
- 
+  }
+
   $middleware_hosts_array = flatten([$middleware_hosts])
-  
+
   mco_user::setting { "plugin.activemq.pool.${name}.host":
     value => $middleware_hosts_array[$name - 1],
   }
 
-  $port = $middleware_ssl ? {
-    true    => $middleware_ssl_port,
-    default => $middleware_port,
-  }
-
   $fallback = $middleware_ssl_fallback ? {
-    true    => 1,
-    default => 0,
+    true    => 'true',
+    default => 'false',
   }
 
   mco_user::setting { "plugin.activemq.pool.${name}.port":
-    value => $port,
+    value => $middleware_port,
   }
 
   mco_user::setting { "plugin.activemq.pool.${name}.user":
@@ -46,15 +40,23 @@ define mco_user::hosts_iteration (
 
   if $middleware_ssl {
     mco_user::setting { "plugin.activemq.pool.${name}.ssl":
-      value => 1,
-    }
-
-    mco_user::setting { "plugin.activemq.pool.${name}.ssl.ca":
-      value => "${confdir}/ca.pem",
+      value => 'true',
     }
 
     mco_user::setting { "plugin.activemq.pool.${name}.ssl.fallback":
       value => $fallback,
+    }
+
+    mco_user::setting { "plugin.activemq.pool.${name}.ssl.ca":
+      value => "${homedir}/.mcollective.d/credentials/certs/ca.pem",
+    }
+
+    mco_user::setting { "plugin.activemq.pool.${name}.ssl.cert":
+      value => "${homedir}/.mcollective.d/credentials/certs/${callerid}.pem",
+    }
+
+    mco_user::setting { "plugin.activemq.pool.${name}.ssl.key":
+      value => "${homedir}/.mcollective.d/credentials/private_keys/${callerid}.pem",
     }
   }
 }

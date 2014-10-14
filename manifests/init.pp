@@ -1,69 +1,148 @@
-# == Class: mco_user
+# == Defined: mco_user
 #
-# Full description of class mco_user here.
+# A defined type to add a MCO client user.
 #
 # === Parameters
 #
-# Document parameters here.
+# [*certificate*]
+#   The absolute path of the local PEM file, on the node, for the CERT.
+#   No Default.
 #
-# [*sample_parameter*]
-#   Explanation of what this parameter affects and what it defaults to.
-#   e.g. "Specify one or more upstream ntp servers as an array."
+# [*middleware_hosts*]
+#   String or an array of FQDN addresses for ActiveMQ brokers to join.
+#   No Default.
 #
-# === Variables
+# [*private_key*]
+#   The absolute path of the local PEM file, ont he node, for the provate key.
+#   No Default.
 #
-# Here you should define a list of variables that this module would require.
+# [*ssl_ca_cert*]
+#   The absolute path of the local PEM file, on the node, for the CA CERT.
+#   No Default.
 #
-# [*sample_variable*]
-#   Explanation of how this variable affects the funtion of this class and if
-#   it has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#   External Node Classifier as a comma separated list of hostnames." (Note,
-#   global variables should be avoided in favor of class parameters as
-#   of Puppet 2.6.)
+# [*ssl_server_public*]
+#   The absolute path of the local PEM file, on the node, for the public key.
+#   No Default.
+#
+# [*callerid*]
+#   The name of the caller for the client.
+#   Default is $name.
+#
+# [*collective*]
+#   A string or array of collectives the client belongs too.
+#   Default is 'mcollective'.
+#
+# [*confdir*]
+#   The absolute path for the MCollective configuration path.
+#   Defaults to '/etc/puppetlabs/mcollective'.
+#
+# [*core_libdir*]
+#   Core library path for MCollective.
+#   Defaults to '/opt/puppet/libexec/mcollective'.
+#
+# [*group*]
+#   Group for file ownership.
+#   Defaults to $name.
+#
+# [*homedir*]
+#   Home directory of user.
+#   Defaults to '/home/${username}'.
+#
+# [*logfile*]
+#   Absolute path for the client log.
+#   Defaults to 'var/lib/${username}/.mcollective.d/client.log'.
+#
+# [*loglevel*]
+#   Loglevel for client.
+#   Defaults to 'info'.
+#
+# [*main_collective*]
+#   The main collective for the client.
+#   Defaults to 'mcollective'.
+#
+# [*middleware_password*]
+#   Password for the ActiveMQ Pool client.
+#   Default is 'mcollective'.
+#
+# [*middleware_port*]
+#   Port of the ActiveMQ Pool port.
+#   Default is '61613'.
+#
+# [*middleware_ssl*]
+#   Boolean value to determine if ActiveMQ SSL is enabled.
+#   Defaults is true.
+#
+# [*middleware_ssl_fallback*]
+#   Boolean value to determine if unverified SSL is allowed.
+#   Default is false.
+#
+# [*middleware_user*]
+#   Name of the ActiveMQ Pool user.
+#   Default is $name.
+#
+# [*securityprovider*]
+#   Name of the security provider.
+#   Default is 'ssl'.
+#
+# [*site_libdir*]
+#   Absolute path of the site library directory.
+#   Default is '/usr/local/libexec/mcollective'.
+#
+# [*username*]
+#   User name for file ownership.
+#   Default is $name.
 #
 # === Examples
 #
-#  class { mco_user:
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
+#  mco_user { 'peadmin':
+#   certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
+#   middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
+#   ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
+#   ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
+#   homedir           => '/var/lib/peadmin',
+#   middleware_user   => 'mcollective',
 #  }
 #
 # === Authors
 #
-# Author Name <author@domain.com>
+# Brett Gray <brett.gray@puppetlabs.com>
 #
 # === Copyright
 #
-# Copyright 2014 Your name here, unless otherwise noted.
+# Copyright 2014 Puppet Labs, unless otherwise stated.
 #
 define mco_user (
-  $username           = $name,
-  $loglevel           = 'info',
-  $logfile            = "/var/lib/${username}/.mcollective.d/client.log",
-  $callerid           = $username,
-  $group              = $username,
-  $homedir            = "/home/${username}",
-  $certificate        = undef,
-  $private_key        = undef,
-  $main_collective    = 'mcollective',
-  $collectives        = 'mcollective',
-  $ssl_ca_cert        = undef,
-  $ssl_server_public  = undef,
-  $middleware_hosts   = undef,
-  $middleware_ssl     = true,
-  $securityprovider   = 'ssl',
-  $connector          = 'activemq',
-  $core_libdir        = '/opt/puppet/libexec/mcollective',
-  $site_libdir        = '/usr/local/libexec/mcollective',
-  $middleware_password           = undef,
-  $middleware_user = $name,
-  $middleware_ssl_port = '61613',
-  $middleware_port = '61613',
-  $middleware_ssl_fallback = false,
-  $confdir = '/etc/puppetlabs/mcollective',
+  $certificate,
+  $middleware_hosts,
+  $private_key,
+  $ssl_ca_cert,
+  $ssl_server_public,
+  $callerid                 = $name,
+  $collectives              = 'mcollective',
+  $confdir                  = '/etc/puppetlabs/mcollective',
+  $core_libdir              = '/opt/puppet/libexec/mcollective',
+  $group                    = $name,
+  $homedir                  = "/home/${username}",
+  $logfile                  = "/var/lib/${username}/.mcollective.d/client.log",
+  $loglevel                 = 'info',
+  $main_collective          = 'mcollective',
+  $middleware_password      = 'mcollective',
+  $middleware_port          = '61613',
+  $middleware_ssl           = true,
+  $middleware_ssl_fallback  = false,
+  $middleware_user          = $name,
+  $securityprovider         = 'ssl',
+  $site_libdir              = '/usr/local/libexec/mcollective',
+  $username                 = $name,
 ) {
 
+  #validation
+  validate_bool($middleware_ssl)
+  validate_bool($middleware_ssl_fallback)
 
-notify { $username: }
+  #variables
+  $connector = 'activemq'
+
   file { [
     "${homedir}/.mcollective.d",
     "${homedir}/.mcollective.d/credentials",
@@ -139,16 +218,13 @@ notify { $username: }
       mode   => '0444',
     }
 
-    $private_path = "${homedir}/.mcollective.d/credentials/private_keys/${callerid}.pem"
-    file { $private_path:
+    file { "${homedir}/.mcollective.d/credentials/private_keys/${callerid}.pem":
       source => $private_key,
       owner  => $username,
       group  => $group,
       mode   => '0400',
     }
-  }
 
-  if $securityprovider == 'ssl' {
     file { "${homedir}/.mcollective.d/credentials/certs/${callerid}.pem":
       source => $certificate,
       owner  => $username,
@@ -180,25 +256,38 @@ notify { $username: }
     }
   }
 
-  if $connector == 'activemq' {
-    # This is specific to connector, but refers to the user's certs
-    $pool_size = size(flatten([$middleware_hosts]))
-    $hosts = range( '1', $pool_size )
-    $connectors = prefix( $hosts, "${username}_" )
-    class { 'mco_user::activemq':
-      callerid       => $callerid,
-      confdir => $confdir,
-      connector      => $connector,
-      homedir        => $homedir,
-      middleware_hosts => $middleware_hosts,
-      middleware_password => $middleware_password,
-      middleware_port => $middleware_port,
-      middleware_ssl => $middleware_ssl,
-      middleware_ssl_fallback => $middleware_ssl_fallback,
-      middleware_ssl_port => $middleware_ssl_port,
-      middleware_user => $middleware_user,
-      order          => '60',
-      username       => $username,
-    }
+
+  mco_user::setting { 'direct_addressing':
+    value => 1,
+  }
+
+  mco_user::setting { 'plugin.activemq.base64':
+    value => 'yes',
+  }
+
+  mco_user::setting { 'plugin.activemq.randomize':
+    value => 'true',
+  }
+
+  $pool_size = size(flatten([$middleware_hosts]))
+  mco_user::setting { "${username}-plugin.activemq.pool.size":
+    setting => 'plugin.activemq.pool.size',
+    value   => $pool_size,
+  }
+
+  # This is specific to connector, but refers to the user's certs
+  $hosts = range( '1', $pool_size )
+  $connectors = prefix( $hosts, "${username}_" )
+  $indexes = range('1', $pool_size)
+  mco_user::hosts_iteration { $indexes:
+    confdir                 => $confdir,
+    homedir                 => $homedir,
+    middleware_hosts        => $middleware_hosts,
+    middleware_password     => $middleware_password,
+    middleware_port         => $middleware_port,
+    middleware_ssl          => $middleware_ssl,
+    middleware_ssl_fallback => $middleware_ssl_fallback,
+    middleware_user         => $middleware_user,
+    username                => $username,
   }
 }
