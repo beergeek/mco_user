@@ -304,6 +304,7 @@ define mco_user (
   $connectors = prefix( $hosts, "${username}_" )
   $indexes = range('1', $pool_size)
   mco_user::hosts_iteration { $indexes:
+    callerid                => $callerid,
     confdir                 => $confdir,
     homedir                 => $homedir,
     middleware_hosts        => $middleware_hosts,

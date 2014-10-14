@@ -218,6 +218,7 @@ describe 'mco_user' do
 
     it {
       should contain_mco_user__hosts_iteration('1').with(
+        'callerid'                => 'peadmin',
         'confdir'                 => '/etc/puppetlabs/mcollective',
         'homedir'                 => '/var/lib/peadmin',
         'middleware_hosts'        => 'ca.puppetlabs.vm',
