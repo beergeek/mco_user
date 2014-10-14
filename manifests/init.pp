@@ -136,6 +136,10 @@ define mco_user (
   $username                 = $name,
 ) {
 
+  if $::osfamily != 'RedHat' and $::operatingsystemmajrelease != '6' {
+    fail("This module is only designed for RHEL6, not ${::osfamily}, ${::operatingsystemmajrelease}")
+  }
+
   #validation
   validate_bool($middleware_ssl)
   validate_bool($middleware_ssl_fallback)
@@ -160,7 +164,7 @@ define mco_user (
     owner    => $username,
     group    => $group,
     mode     => '0400',
-    template => 'mcollective/settings.cfg.erb',
+    template => 'mco_user/settings.cfg.erb',
   }
 
   Mco_user::Setting {

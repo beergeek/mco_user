@@ -15,65 +15,157 @@
 
 ## Overview
 
-A one-maybe-two sentence summary of what the module does/what problem it solves.
-This is your 30 second elevator pitch for your module. Consider including
-OS/Puppet version it works with.
+A module to manage MCO client user configuration.
+More capability in the targeted environment than puppetlabs-mcollective.
 
 ## Module Description
 
-If applicable, this section should have a brief description of the technology
-the module integrates with and what that integration enables. This section
-should answer the questions: "What does this module *do*?" and "Why would I use
-it?"
-
-If your module has a range of functionality (installation, configuration,
-management, etc.) this is the time to mention it.
+Targeted to PE installations using ActiveMQ.
 
 ## Setup
 
 ### What mco_user affects
 
-* A list of files, packages, services, or operations that the module will alter,
-  impact, or execute on the system it's installed on.
-* This is a great place to stick any warnings.
-* Can be in list or paragraph form.
+* User's .mcollective.d directory
+* User's .mcollective file
+* User's certificates and keys for MCollective.
 
-### Setup Requirements **OPTIONAL**
 
-If your module requires anything extra before setting up (pluginsync enabled,
-etc.), mention it here.
+### Setup Requirements
+
+This module assumes the user exists, their home directory, and keys/certs.
 
 ### Beginning with mco_user
 
-The very basic steps needed for a user to get the module up and running.
-
-If your most recent release breaks compatibility or requires particular steps
-for upgrading, you may wish to include an additional section here: Upgrading
-(For an example, see http://forge.puppetlabs.com/puppetlabs/firewall).
+As a minimum the user's keys and certs must be provided, plus the ActiveMQ broker.
+```puppet
+  mco_user { 'peadmin':
+    certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
+    middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
+    ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
+    ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
+    homedir           => '/var/lib/peadmin',
+    middleware_user   => 'mcollective',
+  }
+```
 
 ## Usage
 
-Put the classes, types, and resources for customizing, configuring, and doing
-the fancy stuff with your module here.
+###Public
+####mco_user: defined type to manage MCollective user
+
+###Private
+####mco_user::hosts_iteration: defined type to manage ActiveMQ entries.
 
 ## Reference
 
-Here, list the classes, types, providers, facts, etc contained in your module.
-This section should include all of the under-the-hood workings of your module so
-people know what the module is touching on their system but don't need to mess
-with things. (We are working on automating this section!)
+###Parameters
+
+####mco_user
+
+#####`certificate`
+The absolute path of the local PEM file, on the node, for the CERT.
+No Default.
+
+#####`middleware_hosts`
+String or an array of FQDN addresses for ActiveMQ brokers to join.
+No Default.
+
+#####`private_key`
+The absolute path of the local PEM file, ont he node, for the provate key.
+No Default.
+
+#####`ssl_ca_cert`
+The absolute path of the local PEM file, on the node, for the CA CERT.
+No Default.
+
+#####`ssl_server_public`
+The absolute path of the local PEM file, on the node, for the public key.
+No Default.
+
+#####`callerid`
+The name of the caller for the client.
+Default is $name.
+
+#####`collective`
+A string or array of collectives the client belongs too.
+Default is 'mcollective'.
+
+#####`confdir`
+The absolute path for the MCollective configuration path.
+Defaults to '/etc/puppetlabs/mcollective'.
+
+#####`core_libdir`
+Core library path for MCollective.
+Defaults to '/opt/puppet/libexec/mcollective'.
+
+#####`group`
+Group for file ownership.
+Defaults to $name.
+
+#####`homedir`
+Home directory of user.
+Defaults to '/home/${username}'.
+
+#####`logfile`
+Absolute path for the client log.
+Defaults to 'var/lib/${username}/.mcollective.d/client.log'.
+
+#####`loglevel`
+Loglevel for client.
+Defaults to 'info'.
+
+#####`main_collective`
+The main collective for the client.
+Defaults to 'mcollective'.
+
+#####`middleware_password`
+Password for the ActiveMQ Pool client.
+Default is 'mcollective'.
+
+#####`middleware_port`
+Port of the ActiveMQ Pool port.
+Default is '61613'.
+
+#####`middleware_ssl`
+Boolean value to determine if ActiveMQ SSL is enabled.
+Defaults is true.
+
+#####`middleware_ssl_fallback`
+Boolean value to determine if unverified SSL is allowed.
+Default is false.
+
+#####`middleware_user`
+Name of the ActiveMQ Pool user.
+Default is $name.
+
+#####`securityprovider`
+Name of the security provider.
+Default is 'ssl'.
+
+#####`site_libdir`
+Absolute path of the site library directory.
+Default is '/usr/local/libexec/mcollective'.
+
+#####`username`
+User name for file ownership.
+Default is $name.
+
+```puppet
+  mco_user { 'peadmin':
+    certificate       => '/etc/puppetlabs/puppet/ssl/certs/pe-internal-peadmin-mcollective-client.pem',
+    middleware_hosts  => ['s0.puppetlabs.vm','s1.puppetlabs.vm'],
+    ssl_ca_cert       => '/etc/puppetlabs/puppet/ssl/certs/ca.pem',
+    ssl_server_public => '/etc/puppetlabs/puppet/ssl/public_keys/pe-internal-mcollective-servers.pem',
+    homedir           => '/var/lib/peadmin',
+    middleware_user   => 'mcollective',
+  }
+```
 
 ## Limitations
 
-This is where you list OS compatibility, version compatibility, etc.
+Tested only on RHEL6.5
 
 ## Development
 
-Since your module is awesome, other users will want to play with it. Let them
-know what the ground rules for contributing are.
 
-## Release Notes/Contributors/Etc **Optional**
-
-If you aren't using changelog, put your release notes here (though you should
-consider using changelog). You may also add any additional sections you feel are
-necessary or important to include here. Please use the `## ` header.
