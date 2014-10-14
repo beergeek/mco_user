@@ -11,6 +11,11 @@ define mco_user::hosts_iteration (
   $middleware_user,
   $username,
 ) {
+
+  if $caller_module_name != $module_name {
+    fail("Use of private class ${name} by ${caller_module_name}")
+  }
+
   Mco_user::Setting {
     username => $username,
   }
