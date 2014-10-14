@@ -28,6 +28,10 @@
 #   The absolute path of the local PEM file, on the node, for the public key.
 #   No Default.
 #
+# [*base64*]
+#   Boolean value to determine if Base64 plugin is enabled.
+#   Default is true.
+#
 # [*callerid*]
 #   The name of the caller for the client.
 #   Default is $name.
@@ -124,6 +128,7 @@ define mco_user (
   $ssl_ca_cert,
   $ssl_server_public,
   $username                 = $title,
+  $base64                   = true,
   $callerid                 = $title,
   $collectives              = 'mcollective',
   $confdir                  = '/etc/puppetlabs/mcollective',
@@ -235,9 +240,11 @@ define mco_user (
     value   => '/etc/puppetlabs/mcollective/facts.yaml',
   }
 
-  mco_user::setting { "${username}:plugin.activemq.base64":
-    setting => 'plugin.activemq.base64',
-    value   => 'yes',
+  if $base64 {
+    mco_user::setting { "${username}:plugin.activemq.base64":
+      setting => 'plugin.activemq.base64',
+      value   => '1',
+    }
   }
 
   if $middleware_ssl or $securityprovider == 'ssl' {

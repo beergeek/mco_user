@@ -87,6 +87,10 @@ No Default.
 The absolute path of the local PEM file, on the node, for the public key.
 No Default.
 
+#####`base64`
+Boolean value to determine if Base64 plugin is enabled.
+Default is true.
+
 #####`callerid`
 The name of the caller for the client.
 Default is $name.
