@@ -11,6 +11,10 @@
     {
       "name": "puppetlabs-stdlib",
       "version_range": ">= 1.0.0"
+    },
+    {
+      "name": "richardc-datacat",
+      "version": ">= 0.6.1"
     }
   ]
 }
