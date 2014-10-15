@@ -99,13 +99,13 @@ Default is $name.
 A string or array of collectives the client belongs too.
 Default is 'mcollective'.
 
-#####`confdir`
-The absolute path for the MCollective configuration path.
-Defaults to '/etc/puppetlabs/mcollective'.
-
 #####`core_libdir`
 Core library path for MCollective.
 Defaults to '/opt/puppet/libexec/mcollective'.
+
+####`discovery_timeout`
+Timeout for discovery, in seconds.
+Default is 5.
 
 #####`group`
 Group for file ownership.

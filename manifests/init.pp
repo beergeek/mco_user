@@ -40,13 +40,13 @@
 #   A string or array of collectives the client belongs too.
 #   Default is 'mcollective'.
 #
-# [*confdir*]
-#   The absolute path for the MCollective configuration path.
-#   Defaults to '/etc/puppetlabs/mcollective'.
-#
 # [*core_libdir*]
 #   Core library path for MCollective.
 #   Defaults to '/opt/puppet/libexec/mcollective'.
+#
+# [*discovery_timeout*]
+#   Timeout for discovery, in seconds.
+#   Default is 5.
 #
 # [*group*]
 #   Group for file ownership.
@@ -131,8 +131,8 @@ define mco_user (
   $base64                   = true,
   $callerid                 = $title,
   $collectives              = 'mcollective',
-  $confdir                  = '/etc/puppetlabs/mcollective',
   $core_libdir              = '/opt/puppet/libexec/mcollective',
+  $discovery_timeout        = '5',
   $group                    = $title,
   $homedir                  = "/home/${title}",
   $logfile                  = "/var/lib/${title}/.mcollective.d/client.log",
@@ -240,6 +240,11 @@ define mco_user (
     value   => '/etc/puppetlabs/mcollective/facts.yaml',
   }
 
+  mco_user::setting { "${username}:discovery_timeout":
+    setting => 'discovery_timeout',
+    value   => $discovery_timeout,
+  }
+
   if $base64 {
     mco_user::setting { "${username}:plugin.activemq.base64":
       setting => 'plugin.activemq.base64',
@@ -310,7 +315,7 @@ define mco_user (
 
   mco_user::setting { "${username}:plugin.activemq.randomize":
     setting => 'plugin.activemq.randomize',
-    value   => 'true',
+    value   => 'false',
   }
 
   $pool_size = size(flatten([$middleware_hosts]))
@@ -325,7 +330,6 @@ define mco_user (
   $indexes = range('1', $pool_size)
   mco_user::hosts_iteration { $indexes:
     callerid                => $callerid,
-    confdir                 => $confdir,
     homedir                 => $homedir,
     middleware_hosts        => $middleware_hosts,
     middleware_password     => $middleware_password,
