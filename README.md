@@ -103,7 +103,7 @@ Default is 'mcollective'.
 Core library path for MCollective.
 Defaults to '/opt/puppet/libexec/mcollective'.
 
-####`discovery_timeout`
+#####`discovery_timeout`
 Timeout for discovery, in seconds.
 Default is 5.
 
