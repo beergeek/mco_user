@@ -203,7 +203,7 @@ describe 'mco_user' do
 
     it {
       should contain_mco_user__setting('peadmin:discovery_timeout').with(
-        'setting'   => 'discovery_time',
+        'setting'   => 'discovery_timeout',
         'value'     => '5',
         'username'  => 'peadmin',
       )
@@ -477,7 +477,7 @@ describe 'mco_user' do
         'middleware_hosts'        => 'ca.puppetlabs.vm',
         'middleware_password'     => 'W3_L0ve_L@ur3lW00d_1PA',
         'middleware_port'         => '61613',
-        'middleware_ssl'          => true,
+        'middleware_ssl'          => false,
         'middleware_ssl_fallback' => false,
         'middleware_user'         => 'mcollective',
         'username'                => 'peadmin',

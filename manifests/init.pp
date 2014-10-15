@@ -128,7 +128,7 @@ define mco_user (
   $ssl_ca_cert,
   $ssl_server_public,
   $username                 = $title,
-  $base64                   = true,
+  $base64                   = 'yes',
   $callerid                 = $title,
   $collectives              = 'mcollective',
   $core_libdir              = '/opt/puppet/libexec/mcollective',
@@ -248,7 +248,7 @@ define mco_user (
   if $base64 {
     mco_user::setting { "${username}:plugin.activemq.base64":
       setting => 'plugin.activemq.base64',
-      value   => '1',
+      value   => 'yes',
     }
   }
 
