@@ -89,7 +89,7 @@ No Default.
 
 #####`base64`
 Boolean value to determine if Base64 plugin is enabled.
-Default is true.
+Default is 'yes'.
 
 #####`callerid`
 The name of the caller for the client.

@@ -30,7 +30,7 @@
 #
 # [*base64*]
 #   Boolean value to determine if Base64 plugin is enabled.
-#   Default is true.
+#   Default is yes.
 #
 # [*callerid*]
 #   The name of the caller for the client.
@@ -162,6 +162,9 @@ define mco_user (
   validate_absolute_path($ssl_server_public)
   validate_bool($middleware_ssl)
   validate_bool($middleware_ssl_fallback)
+  if ! member(['yes','no'], $base64) {
+    fail("The `base64` variable can only be yes or no, not ${base64}")
+  }
 
   #variables
   $connector = 'activemq'
